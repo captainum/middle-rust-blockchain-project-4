@@ -3,10 +3,10 @@
 
 #![deny(unreachable_pub)]
 
-use std::ffi::CString;
 use clap::Parser;
 use image_processor::plugin_loader::Plugin;
 use image_processor::{load_png, plugin_name_to_filename, read_params, save_png};
+use std::ffi::CString;
 
 use std::path::PathBuf;
 
