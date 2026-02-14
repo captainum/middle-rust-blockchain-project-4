@@ -3,6 +3,7 @@
 
 #![deny(unreachable_pub)]
 
+use std::ffi::CString;
 use clap::Parser;
 use image_processor::plugin_loader::Plugin;
 use image_processor::{load_png, plugin_name_to_filename, read_params, save_png};
@@ -59,12 +60,7 @@ fn main() -> anyhow::Result<()> {
             width,
             height,
             rgba_data.as_mut_ptr(),
-            params
-                .as_bytes()
-                .iter()
-                .map(|&b| b as i8)
-                .collect::<Vec<_>>()
-                .as_ptr(),
+            CString::new(params)?.as_ptr(),
         )
     };
 
