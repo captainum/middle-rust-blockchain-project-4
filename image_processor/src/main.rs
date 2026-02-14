@@ -36,8 +36,10 @@ struct Cli {
 }
 
 fn plugin_name_to_filename(plugin: &str) -> String {
-    if cfg!(any(target_os = "linux", target_os = "macos")) {
+    if cfg!(target_os = "linux") {
         format!("lib{}.so", plugin)
+    } else if cfg!(target_os = "macos") {
+        format!("{}.dylib", plugin)
     } else if cfg!(target_os = "windows") {
         format!("{}.dll", plugin)
     } else {

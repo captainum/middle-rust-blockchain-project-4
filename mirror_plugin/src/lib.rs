@@ -20,7 +20,12 @@ struct Params {
 /// В случае некорректности переданных параметров будет выдано соответствующее сообщение. При этом
 /// входной массив данных останется без изменений.
 #[unsafe(no_mangle)]
-extern "C" fn process_image(width: u32, height: u32, rgba_data: *mut u8, params: *const c_char) {
+pub extern "C" fn process_image(
+    width: u32,
+    height: u32,
+    rgba_data: *mut u8,
+    params: *const c_char,
+) {
     let params = match from_slice::<Params>(unsafe { CStr::from_ptr(params) }.to_bytes()) {
         Ok(params) => params,
         Err(e) => {
