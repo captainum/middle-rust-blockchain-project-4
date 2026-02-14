@@ -197,7 +197,6 @@ dependencies = [
 name = "blur_plugin"
 version = "0.1.0"
 dependencies = [
- "log",
  "rstest",
  "serde",
  "serde_json",
@@ -711,7 +710,6 @@ dependencies = [
 name = "mirror_plugin"
 version = "0.1.0"
 dependencies = [
- "log",
  "rstest",
  "serde",
  "serde_json",

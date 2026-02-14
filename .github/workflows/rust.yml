@@ -25,3 +25,5 @@ jobs:
       - uses: actions/checkout@v4
       - name: build
         run: cargo build --workspace
+      - name: tests
+        run: cargo test

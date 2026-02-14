@@ -4,73 +4,48 @@
 #![deny(unreachable_pub)]
 
 use clap::Parser;
-use image_processor::load_png;
 use image_processor::plugin_loader::Plugin;
-use std::io::BufRead;
+use image_processor::{load_png, plugin_name_to_filename, read_params, save_png};
 
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 /// Взаимодействие с CLI-приложением.
 #[derive(Debug, Parser)]
 #[command(version, about)]
 struct Cli {
     /// Путь к исходному PNG-изображению
-    #[arg(long)]
+    #[arg(long, value_name = "/path/to/png/image")]
     input: PathBuf,
 
     /// Путь, по которому будет сохранено обработанное изображение
-    #[arg(long)]
+    #[arg(long, value_name = "/path/to/save/destination/of/png/image")]
     output: PathBuf,
 
     /// Имя плагина (динамической библиотеки) без расширения (например, invert)
-    #[arg(long)]
+    #[arg(long, default_value = "blur_plugin")]
     plugin: String,
 
     /// Путь к текстовому файлу с параметрами обработки
-    #[arg(long)]
+    #[arg(long, value_name = "/path/to/params/file")]
     params: PathBuf,
 
     /// Путь к директории, где находится плагин
-    #[arg(long, default_value = "target/debug")]
+    #[arg(
+        long,
+        value_name = "/path/to/plugin/dir",
+        default_value = "target/debug"
+    )]
     plugin_path: PathBuf,
-}
-
-fn plugin_name_to_filename(plugin: &str) -> String {
-    if cfg!(target_os = "linux") {
-        format!("lib{}.so", plugin)
-    } else if cfg!(target_os = "macos") {
-        format!("{}.dylib", plugin)
-    } else if cfg!(target_os = "windows") {
-        format!("{}.dll", plugin)
-    } else {
-        unimplemented!("unsupported platform")
-    }
-}
-
-fn read_params(params: &Path) -> anyhow::Result<String> {
-    if !params.exists() {
-        return Err(anyhow::anyhow!(
-            "Файл с параметрами обработки {} не существует!",
-            params.display()
-        ));
-    }
-
-    let f = std::fs::File::open(params)?;
-
-    let mut result = String::new();
-    std::io::BufReader::new(f).read_line(&mut result)?;
-
-    Ok(result)
 }
 
 fn main() -> anyhow::Result<()> {
     let args = Cli::parse();
 
-    let img = load_png(&args.input)?;
+    let mut img = load_png(&args.input)?;
 
     let width = img.width;
     let height = img.height;
-    let mut rgba_data = img.pixels;
+    let rgba_data = &mut img.pixels;
 
     let params = read_params(&args.params)?;
 
@@ -92,6 +67,8 @@ fn main() -> anyhow::Result<()> {
                 .as_ptr(),
         )
     };
+
+    save_png(&img, &args.output)?;
 
     Ok(())
 }

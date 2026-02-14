@@ -1,5 +1,7 @@
 //! Плагин зеркального разворота изображения.
 
+#![deny(unreachable_pub)]
+
 use core::ffi::c_char;
 use serde::{Deserialize, Serialize};
 use serde_json::from_slice;
@@ -33,7 +35,7 @@ pub unsafe extern "C" fn process_image(
     let params = match from_slice::<Params>(unsafe { CStr::from_ptr(params) }.to_bytes()) {
         Ok(params) => params,
         Err(e) => {
-            log::error!("Некорректный формат переданных параметров: {}", e);
+            eprintln!("Некорректный формат переданных параметров: {}", e);
             return;
         }
     };
@@ -84,9 +86,14 @@ mod tests {
     fn test_stable(#[case] width: u32, #[case] height: u32, #[case] expected: &[u8]) {
         let mut data = prepare_data(width, height);
 
-        let params =
-            CString::new(serde_json::json!({"horizontal": false, "vertical": false}).to_string())
-                .unwrap();
+        let params = CString::new(
+            serde_json::to_string(&Params {
+                horizontal: false,
+                vertical: false,
+            })
+            .unwrap(),
+        )
+        .unwrap();
 
         unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
@@ -104,9 +111,14 @@ mod tests {
     fn test_horizontal(#[case] width: u32, #[case] height: u32, #[case] expected: &[u8]) {
         let mut data = prepare_data(width, height);
 
-        let params =
-            CString::new(serde_json::json!({"horizontal": true, "vertical": false}).to_string())
-                .unwrap();
+        let params = CString::new(
+            serde_json::to_string(&Params {
+                horizontal: true,
+                vertical: false,
+            })
+            .unwrap(),
+        )
+        .unwrap();
 
         unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
@@ -121,9 +133,14 @@ mod tests {
     fn test_vertical(#[case] width: u32, #[case] height: u32, #[case] expected: &[u8]) {
         let mut data = prepare_data(width, height);
 
-        let params =
-            CString::new(serde_json::json!({"horizontal": false, "vertical": true}).to_string())
-                .unwrap();
+        let params = CString::new(
+            serde_json::to_string(&Params {
+                horizontal: false,
+                vertical: true,
+            })
+            .unwrap(),
+        )
+        .unwrap();
 
         unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
@@ -147,9 +164,14 @@ mod tests {
     fn test_both(#[case] width: u32, #[case] height: u32, #[case] expected: &[u8]) {
         let mut data = prepare_data(width, height);
 
-        let params =
-            CString::new(serde_json::json!({"horizontal": true, "vertical": true}).to_string())
-                .unwrap();
+        let params = CString::new(
+            serde_json::to_string(&Params {
+                horizontal: true,
+                vertical: true,
+            })
+            .unwrap(),
+        )
+        .unwrap();
 
         unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 

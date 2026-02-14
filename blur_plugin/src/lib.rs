@@ -1,5 +1,7 @@
 //! Плагин размытия изображения.
 
+#![deny(unreachable_pub)]
+
 use serde::{Deserialize, Serialize};
 use serde_json::from_slice;
 use std::ffi::{CStr, c_char};
@@ -32,7 +34,7 @@ pub unsafe extern "C" fn process_image(
     let params = match from_slice::<Params>(unsafe { CStr::from_ptr(params) }.to_bytes()) {
         Ok(params) => params,
         Err(e) => {
-            log::error!("Некорректный формат переданных параметров: {}", e);
+            eprintln!("Некорректный формат переданных параметров: {}", e);
             return;
         }
     };
