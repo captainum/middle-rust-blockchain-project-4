@@ -1,12 +1,12 @@
 //! Плагин зеркального разворота изображения.
 
 use core::ffi::c_char;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use serde_json::from_slice;
 use std::ffi::CStr;
 
 /// Параметры плагина.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Params {
     /// Отразить по горизонтали.
     horizontal: bool,
@@ -19,8 +19,12 @@ struct Params {
 ///
 /// В случае некорректности переданных параметров будет выдано соответствующее сообщение. При этом
 /// входной массив данных останется без изменений.
+///
+/// # Safety
+/// * len(rgba_data) == width * height * 4
+/// * params - валидная C-строка != NULL
 #[unsafe(no_mangle)]
-pub extern "C" fn process_image(
+pub unsafe extern "C" fn process_image(
     width: u32,
     height: u32,
     rgba_data: *mut u8,
@@ -84,7 +88,7 @@ mod tests {
             CString::new(serde_json::json!({"horizontal": false, "vertical": false}).to_string())
                 .unwrap();
 
-        process_image(width, height, data.as_mut_ptr(), params.as_ptr());
+        unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
         assert_eq!(data, expected);
     }
@@ -104,7 +108,7 @@ mod tests {
             CString::new(serde_json::json!({"horizontal": true, "vertical": false}).to_string())
                 .unwrap();
 
-        process_image(width, height, data.as_mut_ptr(), params.as_ptr());
+        unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
         assert_eq!(data, expected);
     }
@@ -121,7 +125,7 @@ mod tests {
             CString::new(serde_json::json!({"horizontal": false, "vertical": true}).to_string())
                 .unwrap();
 
-        process_image(width, height, data.as_mut_ptr(), params.as_ptr());
+        unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
         assert_eq!(data, expected);
     }
@@ -147,7 +151,7 @@ mod tests {
             CString::new(serde_json::json!({"horizontal": true, "vertical": true}).to_string())
                 .unwrap();
 
-        process_image(width, height, data.as_mut_ptr(), params.as_ptr());
+        unsafe { process_image(width, height, data.as_mut_ptr(), params.as_ptr()) };
 
         assert_eq!(data, expected);
     }
