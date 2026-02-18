@@ -2,6 +2,7 @@
 
 use core::ffi::{c_char, c_void};
 use libloading::{Library, Symbol};
+use log::info;
 use std::path::Path;
 
 /// Обертка над подключаемым плагином.
@@ -27,11 +28,10 @@ pub struct PluginInterface<'a> {
 impl Plugin {
     /// Загрузить плагин по заданному пути.
     pub fn new(path: &Path) -> anyhow::Result<Self> {
+        info!("Загрузка плагина из {}", path.display());
+
         if !path.exists() {
-            return Err(anyhow::anyhow!(
-                "Библиотеки плагина {} не существует!",
-                path.display()
-            ));
+            anyhow::bail!("Библиотеки плагина {} не существует!", path.display());
         }
 
         let plugin = unsafe { Library::new(path) }?;

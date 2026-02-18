@@ -8,3 +8,5 @@ image = { workspace = true }
 clap = { workspace = true }
 anyhow = { workspace = true }
 libloading = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }

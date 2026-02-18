@@ -31,7 +31,7 @@ cargo build --workspace --release
 ```
  cargo run --release --bin image_processor -- \
  --input ./image_processor/data/img.png \
- --output ./image_processor/data/img_mirror.jpg \
+ --output ./image_processor/data/img_mirror.png \
  --plugin mirror_plugin \
  --params ./image_processor/data/mirror_params.json \
  --plugin-path target/release
@@ -42,7 +42,18 @@ cargo build --workspace --release
 ```
  cargo run --release --bin image_processor -- \
  --input ./image_processor/data/img.png \
- --output ./image_processor/data/img_blur.jpg \
+ --output ./image_processor/data/img_blur.png \
+ --plugin blur_plugin \
+ --params ./image_processor/data/blur_params.json \
+ --plugin-path target/release
+```
+
+Доступно установление уровня логирования через переменную окружения RUST_LOG (по-умолчанию - info):
+
+```
+ RUST_LOG=debug cargo run --release --bin image_processor -- \
+ --input ./image_processor/data/img.png \
+ --output ./image_processor/data/img_blur.png \
  --plugin blur_plugin \
  --params ./image_processor/data/blur_params.json \
  --plugin-path target/release
